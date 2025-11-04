@@ -6,6 +6,8 @@ import authRoutes from './routes/auth.route.js';
 import messageRoutes from './routes/message.route.js';
 import path from 'path';
 import { connectDB } from './lib/db.js';
+import cookieParser from "cookie-parser";
+
 
 
 // app Initialization
@@ -17,13 +19,11 @@ const __dirname = Path.resolve();
 
 // middlewares
 app.use(express.json());
+app.use(cookieParser());
 
 // use routes
 app.use("/api/auth", authRoutes);
 app.use('/api/messages', messageRoutes);
-
-// middlewares
-app.use(express.json())
 
 
 // configuration for deployment

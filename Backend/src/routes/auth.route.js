@@ -12,4 +12,5 @@ router.post("/login", loginValidationRules, validate, login);
 
 router.post("/logout", logout);
 
+
 export default router;
