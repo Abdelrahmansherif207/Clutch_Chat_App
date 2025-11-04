@@ -18,13 +18,13 @@ export const hashPassword = async (pwd) => {
     return hashedPassword;
 }
 
-export const throw500 = (err, devMessage, res) => {
+export const throw500 = (err, producationMessage, res) => {
     console.error(err.message);
     return res.status(500).
         json({
             success: false,
             message: process.env.NODE_ENV
                 === 'developement' ?
-                err.message : devMessage
+                err.message : producationMessage
         })
 }
