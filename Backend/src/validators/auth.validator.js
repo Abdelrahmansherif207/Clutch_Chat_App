@@ -17,3 +17,15 @@ export const signupValidationRules = [
         .isLength({ min: 6 })
         .withMessage('Password must be at least 6 characters long')
 ];
+
+export const loginValidationRules = [
+    body('email')
+        .isEmail()
+        .normalizeEmail()
+        .withMessage('Must be a valid email address'),
+
+    body('password')
+        .isString()
+        .isLength({ min: 6 })
+        .withMessage('Password must be at least 6 characters long')
+]
