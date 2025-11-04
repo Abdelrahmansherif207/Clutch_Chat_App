@@ -1,24 +1,8 @@
-import { generateToken } from '../lib/utils.js';
+import { generateToken, throw500, hashPassword } from '../lib/utils.js';
 import User from '../models/User.js'
 import bcrypt from 'bcryptjs'
 
-const hashPassword = async (pwd) => {
-    const salt = await bcrypt.genSalt(10);
-    const hashedPassword = await bcrypt.hash(pwd, salt);
 
-    return hashedPassword;
-}
-
-const throw500 = (err, devMessage, res) => {
-    console.error(err.message);
-    return res.status(500).
-        json({
-            success: false,
-            message: process.env.NODE_ENV
-                === 'developement' ?
-                err.message : devMessage
-        })
-}
 export const signup = async (req, res) => {
     const { username, email, password } = req.body;
 

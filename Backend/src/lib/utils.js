@@ -10,3 +10,21 @@ export const generateToken = (userId, res) => {
         secure: process.env.NODE_ENV === "development" ? false : true
     })
 }
+
+export const hashPassword = async (pwd) => {
+    const salt = await bcrypt.genSalt(10);
+    const hashedPassword = await bcrypt.hash(pwd, salt);
+
+    return hashedPassword;
+}
+
+export const throw500 = (err, devMessage, res) => {
+    console.error(err.message);
+    return res.status(500).
+        json({
+            success: false,
+            message: process.env.NODE_ENV
+                === 'developement' ?
+                err.message : devMessage
+        })
+}
