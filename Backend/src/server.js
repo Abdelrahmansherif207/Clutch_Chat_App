@@ -5,6 +5,7 @@ import Path from 'path';
 import authRoutes from './routes/auth.route.js';
 import messageRoutes from './routes/message.route.js';
 import path from 'path';
+import { connectDB } from './lib/db.js';
 
 
 // app Initialization
@@ -14,12 +15,15 @@ const PORT = process.env.PORT || 9090;
 
 const __dirname = Path.resolve();
 
+// middlewares
+app.use(express.json());
+
 // use routes
 app.use("/api/auth", authRoutes);
 app.use('/api/messages', messageRoutes);
 
 // middlewares
-
+app.use(express.json())
 
 
 // configuration for deployment
@@ -28,4 +32,7 @@ if (process.env.NODE_ENV == 'production') {
     app.get("*", (_, res) => res.sendFile(path.join(__dirname, "../Frontend", "dist", "index.html")))
 }
 
-app.listen(PORT, () => console.log(`Server is running on http://localhost:${PORT}`)); 
+app.listen(PORT, () => {
+    console.log(`Server is running on http://localhost:${PORT}`)
+    connectDB()
+}); 

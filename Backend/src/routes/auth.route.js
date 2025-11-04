@@ -1,16 +1,15 @@
 import express from 'express';
+import { signup, login, logout } from '../controllers/auth.controller.js';
+import { signupValidationRules } from '../validators/auth.validator.js';
+import { validate } from '../middlewares/validate.js';
+
 const router = express.Router();
 
-router.get("/signup", (req, res) => {
-    res.send("signup endpoint :)")
-})
+// Apply validation middleware to signup route
+router.post("/signup", signupValidationRules, validate, signup);
 
-router.get("/login", (req, res) => {
-    res.send("login endpoint :)")
-})
+router.post("/login", login);
 
-router.get("/logout", (req, res) => {
-    res.send("logout endpoint :)")
-})
+router.get("/logout", logout);
 
 export default router;
