@@ -1,3 +1,4 @@
+import cloudinary from '../lib/cloudinary.js';
 import { generateToken, throw500, hashPassword } from '../lib/utils.js';
 import User from '../models/User.js'
 import bcrypt from 'bcryptjs'
@@ -78,3 +79,33 @@ export const logout = (_, res) => {
         message: "Logged out successfully"
     })
 };
+
+
+export const updateProfile = async (req, res) => {
+    try {
+        const { profilePic } = req.body;
+
+
+        console.log(profilePic);
+
+        if (!profilePic) return res.status(400).json({ success: false, message: "Profile Pic is required" })
+
+        const userId = req.user._id
+        const uploadResponse = await cloudinary.uploader.upload(profilePic);
+
+        const updatedUser = await User.findByIdAndUpdate(
+            userId,
+            { profilePic: uploadResponse.secure_url },
+            { new: true }
+        )
+
+        return res.status(200).json({
+            success: true,
+            message: "Profile updated successfully",
+            data: updatedUser
+        })
+
+    } catch (err) {
+        throw500(err, "Unknown error while updating profile", res)
+    }
+}
