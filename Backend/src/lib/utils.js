@@ -1,4 +1,5 @@
 import jwt from 'jsonwebtoken'
+import bcrypt from 'bcryptjs';
 
 export const generateToken = (userId, res) => {
     const token = jwt.sign({ userId }, process.env.JWT_SECRET, { expiresIn: "7d" });
@@ -24,7 +25,7 @@ export const throw500 = (err, producationMessage, res) => {
         json({
             success: false,
             message: process.env.NODE_ENV
-                === 'developement' ?
+                === 'development' ?
                 err.message : producationMessage
         })
 }
