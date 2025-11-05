@@ -3,10 +3,12 @@ import { signup, login, logout, updateProfile } from '../controllers/auth.contro
 import { signupValidationRules, loginValidationRules } from '../validators/auth.validator.js';
 import { validate } from '../middlewares/validate.js';
 import { protectRoute } from '../middlewares/auth.middleware.js'
+import { arcjetProtection } from '../middlewares/arcjet.middleware.js';
 
 const router = express.Router();
 
-// Apply validation middleware to signup route
+router.use(arcjetProtection);
+
 router.post("/signup", signupValidationRules, validate, signup);
 
 router.post("/login", loginValidationRules, validate, login);
