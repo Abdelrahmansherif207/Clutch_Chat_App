@@ -14,6 +14,6 @@ router.get("/chats", getChatPartners);
 
 router.get("/:id", getMessagesByUserId);
 
-router.post("/send/:id", sendMessage);
+router.post("/send/:id", sendMessageValidationRules, sendMessage);
 
 export default router;
