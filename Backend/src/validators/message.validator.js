@@ -5,7 +5,6 @@ const validateMessage = [
     // Validate text or image is provided
     body('text')
         .optional()
-        .length({ max: 2000 })
         .isString()
         .trim()
         .withMessage('Text must be a valid string and with Maximum 2000 charachters'),
