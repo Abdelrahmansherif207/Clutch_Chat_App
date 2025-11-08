@@ -5,15 +5,16 @@ const validateMessage = [
     // Validate text or image is provided
     body('text')
         .optional()
+        .length({ max: 2000 })
         .isString()
         .trim()
-        .withMessage('Text must be a valid string'),
-        
+        .withMessage('Text must be a valid string and with Maximum 2000 charachters'),
+
     body('image')
         .optional()
         .isString()
         .withMessage('Image must be a valid string'),
-        
+
     // Main validation middleware
     async (req, res, next) => {
         // Check if either text or image is provided
@@ -41,7 +42,7 @@ const validateMessage = [
                     message: 'Receiver not found'
                 });
             }
-            
+
             // Check if sender and receiver are the same
             if (req.params.id === req.user._id.toString()) {
                 return res.status(400).json({
@@ -49,7 +50,7 @@ const validateMessage = [
                     message: 'Cannot send message to yourself'
                 });
             }
-            
+
             next();
         } catch (error) {
             return res.status(400).json({
