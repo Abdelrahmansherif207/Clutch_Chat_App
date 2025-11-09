@@ -1,21 +1,43 @@
 import { useState } from "react";
 import { useAuthStore } from "../store/useAuthStore";
 import BorderAnimatedContainer from "../components/BorderAnimatedContainer";
+import ValidationChat from "../components/ValidationChat";
 import { MessageCircleIcon, LockIcon, MailIcon, UserIcon, LoaderIcon, Eye, EyeOff } from "lucide-react";
 import { Link, useNavigate } from "react-router";
 
 function SignUpPage() {
     const [formData, setFormData] = useState({ username: "", email: "", password: "" });
     const [showPassword, setShowPassword] = useState(false);
+    const [submitCount, setSubmitCount] = useState(0);
+    const [validationErrors, setValidationErrors] = useState({});
+    const [apiError, setApiError] = useState(null);
     const { signup, isSigningUp } = useAuthStore();
     const navigate = useNavigate();
 
     const handleSubmit = async (e) => {
         e.preventDefault();
-        const success = await signup(formData);
-        if (success) {
-            navigate('/');
-        }
+        setApiError(null); // Clear previous errors
+        setSubmitCount(prev => prev + 1); // Increment to trigger validation
+        
+        // Wait for validation to complete, then check API
+        setTimeout(async () => {
+            const result = await signup(formData);
+            // Check if signup failed
+            if (result && result.error) {
+                const errorMessage = result.error?.response?.data?.message || "Something went wrong. Please try again.";
+                setApiError(errorMessage);
+                // Highlight relevant fields based on error
+                if (errorMessage.toLowerCase().includes('email')) {
+                    setValidationErrors(prev => ({ ...prev, email: true }));
+                } else if (errorMessage.toLowerCase().includes('username')) {
+                    setValidationErrors(prev => ({ ...prev, username: true }));
+                } else {
+                    setValidationErrors(prev => ({ ...prev, email: true, username: true }));
+                }
+            } else if (result && result.data) {
+                navigate('/');
+            }
+        }, 3000); // Wait for validation chat to complete
     };
 
     return (
@@ -35,18 +57,24 @@ function SignUpPage() {
 
                                 {/* FORM */}
                                 <form onSubmit={handleSubmit} className="space-y-6">
-                                    {/* FULL NAME */}
+                                    {/* USERNAME */}
                                     <div>
-                                        <label className="auth-input-label">Full Name</label>
+                                        <label className="auth-input-label">Username</label>
                                         <div className="relative">
-                                            <UserIcon className="auth-input-icon" />
+                                            <UserIcon className={`auth-input-icon ${validationErrors.username ? "auth-input-icon-error" : ""}`} />
 
                                             <input
                                                 type="text"
                                                 value={formData.username}
-                                                onChange={(e) => setFormData({ ...formData, username: e.target.value })}
-                                                className="input"
-                                                placeholder="John Doe"
+                                                onChange={(e) => {
+                                                    setFormData({ ...formData, username: e.target.value });
+                                                    // Clear error when user starts typing
+                                                    if (validationErrors.username) {
+                                                        setValidationErrors(prev => ({ ...prev, username: false }));
+                                                    }
+                                                }}
+                                                className={`input ${validationErrors.username ? "input-error" : ""}`}
+                                                placeholder="johndoe"
                                             />
                                         </div>
                                     </div>
@@ -55,13 +83,19 @@ function SignUpPage() {
                                     <div>
                                         <label className="auth-input-label">Email</label>
                                         <div className="relative">
-                                            <MailIcon className="auth-input-icon" />
+                                            <MailIcon className={`auth-input-icon ${validationErrors.email ? "auth-input-icon-error" : ""}`} />
 
                                             <input
-                                                type="email"
+                                                type="text"
                                                 value={formData.email}
-                                                onChange={(e) => setFormData({ ...formData, email: e.target.value })}
-                                                className="input"
+                                                onChange={(e) => {
+                                                    setFormData({ ...formData, email: e.target.value });
+                                                    // Clear error when user starts typing
+                                                    if (validationErrors.email) {
+                                                        setValidationErrors(prev => ({ ...prev, email: false }));
+                                                    }
+                                                }}
+                                                className={`input ${validationErrors.email ? "input-error" : ""}`}
                                                 placeholder="johndoe@gmail.com"
                                             />
                                         </div>
@@ -71,13 +105,19 @@ function SignUpPage() {
                                     <div>
                                         <label className="auth-input-label">Password</label>
                                         <div className="relative">
-                                            <LockIcon className="auth-input-icon" />
+                                            <LockIcon className={`auth-input-icon ${validationErrors.password ? "auth-input-icon-error" : ""}`} />
 
                                             <input
                                                 type={showPassword ? "text" : "password"}
                                                 value={formData.password}
-                                                onChange={(e) => setFormData({ ...formData, password: e.target.value })}
-                                                className="input pr-10"
+                                                onChange={(e) => {
+                                                    setFormData({ ...formData, password: e.target.value });
+                                                    // Clear error when user starts typing
+                                                    if (validationErrors.password) {
+                                                        setValidationErrors(prev => ({ ...prev, password: false }));
+                                                    }
+                                                }}
+                                                className={`input pr-10 ${validationErrors.password ? "input-error" : ""}`}
                                                 placeholder="Enter your password"
                                             />
                                             <button
@@ -112,24 +152,15 @@ function SignUpPage() {
                             </div>
                         </div>
 
-                        {/* FORM ILLUSTRATION - RIGHT SIDE */}
-                        <div className="hidden md:w-1/2 md:flex items-center justify-center p-6 bg-gradient-to-bl from-slate-800/20 to-transparent">
-                            <div>
-                                <img
-                                    src="/signup.png"
-                                    alt="People using mobile devices"
-                                    className="w-full h-auto object-contain"
-                                />
-                                <div className="mt-6 text-center">
-                                    <h3 className="text-xl font-medium text-cyan-400">Start Your Journey Today</h3>
-
-                                    <div className="mt-4 flex justify-center gap-4">
-                                        <span className="auth-badge">Free</span>
-                                        <span className="auth-badge">Easy Setup</span>
-                                        <span className="auth-badge">Private</span>
-                                    </div>
-                                </div>
-                            </div>
+                        {/* VALIDATION CHAT - RIGHT SIDE */}
+                        <div className="hidden md:w-1/2 md:flex items-center justify-center p-6">
+                            <ValidationChat
+                                formData={formData}
+                                mode="signup"
+                                trigger={submitCount}
+                                onValidationChange={setValidationErrors}
+                                apiError={apiError}
+                            />
                         </div>
                     </div>
                 </BorderAnimatedContainer>

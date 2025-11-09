@@ -1,16 +1,33 @@
 import { useState } from "react";
 import { useAuthStore } from "../store/useAuthStore";
 import BorderAnimatedContainer from "../components/BorderAnimatedContainer";
+import ValidationChat from "../components/ValidationChat";
 import { MessageCircleIcon, MailIcon, LoaderIcon, LockIcon } from "lucide-react";
 import { Link } from "react-router";
 
 function LoginPage() {
     const [formData, setFormData] = useState({ email: "", password: "" });
+    const [submitCount, setSubmitCount] = useState(0);
+    const [validationErrors, setValidationErrors] = useState({});
+    const [apiError, setApiError] = useState(null);
     const { login, isLoggingIn } = useAuthStore();
 
-    const handleSubmit = (e) => {
+    const handleSubmit = async (e) => {
         e.preventDefault();
-        login(formData);
+        setApiError(null); // Clear previous errors
+        setSubmitCount(prev => prev + 1); // Increment to trigger validation
+        
+        // Wait for validation to complete, then check API
+        setTimeout(async () => {
+            const result = await login(formData);
+            // Check if login failed
+            if (result && result.error) {
+                const errorMessage = result.error?.response?.data?.message || "Invalid credentials. Please check your email and password.";
+                setApiError(errorMessage);
+                // Highlight both fields on API error
+                setValidationErrors(prev => ({ ...prev, email: true, password: true }));
+            }
+        }, 3000); // Wait for validation chat to complete
     };
 
     return (
@@ -34,13 +51,19 @@ function LoginPage() {
                                     <div>
                                         <label className="auth-input-label">Email</label>
                                         <div className="relative">
-                                            <MailIcon className="auth-input-icon" />
+                                            <MailIcon className={`auth-input-icon ${validationErrors.email ? "auth-input-icon-error" : ""}`} />
 
                                             <input
-                                                type="email"
+                                                type="text"
                                                 value={formData.email}
-                                                onChange={(e) => setFormData({ ...formData, email: e.target.value })}
-                                                className="input"
+                                                onChange={(e) => {
+                                                    setFormData({ ...formData, email: e.target.value });
+                                                    // Clear error when user starts typing
+                                                    if (validationErrors.email) {
+                                                        setValidationErrors(prev => ({ ...prev, email: false }));
+                                                    }
+                                                }}
+                                                className={`input ${validationErrors.email ? "input-error" : ""}`}
                                                 placeholder="johndoe@gmail.com"
                                             />
                                         </div>
@@ -50,13 +73,19 @@ function LoginPage() {
                                     <div>
                                         <label className="auth-input-label">Password</label>
                                         <div className="relative">
-                                            <LockIcon className="auth-input-icon" />
+                                            <LockIcon className={`auth-input-icon ${validationErrors.password ? "auth-input-icon-error" : ""}`} />
 
                                             <input
                                                 type="password"
                                                 value={formData.password}
-                                                onChange={(e) => setFormData({ ...formData, password: e.target.value })}
-                                                className="input"
+                                                onChange={(e) => {
+                                                    setFormData({ ...formData, password: e.target.value });
+                                                    // Clear error when user starts typing
+                                                    if (validationErrors.password) {
+                                                        setValidationErrors(prev => ({ ...prev, password: false }));
+                                                    }
+                                                }}
+                                                className={`input ${validationErrors.password ? "input-error" : ""}`}
                                                 placeholder="Enter your password"
                                             />
                                         </div>
@@ -80,24 +109,15 @@ function LoginPage() {
                             </div>
                         </div>
 
-                        {/* FORM ILLUSTRATION - RIGHT SIDE */}
-                        <div className="hidden md:w-1/2 md:flex items-center justify-center p-6 bg-gradient-to-bl from-slate-800/20 to-transparent">
-                            <div>
-                                <img
-                                    src="/login.png"
-                                    alt="People using mobile devices"
-                                    className="w-full h-auto object-contain"
-                                />
-                                <div className="mt-6 text-center">
-                                    <h3 className="text-xl font-medium text-cyan-400">Connect anytime, anywhere</h3>
-
-                                    <div className="mt-4 flex justify-center gap-4">
-                                        <span className="auth-badge">Free</span>
-                                        <span className="auth-badge">Easy Setup</span>
-                                        <span className="auth-badge">Private</span>
-                                    </div>
-                                </div>
-                            </div>
+                        {/* VALIDATION CHAT - RIGHT SIDE */}
+                        <div className="hidden md:w-1/2 md:flex items-center justify-center p-6">
+                            <ValidationChat
+                                formData={formData}
+                                mode="login"
+                                trigger={submitCount}
+                                onValidationChange={setValidationErrors}
+                                apiError={apiError}
+                            />
                         </div>
                     </div>
                 </BorderAnimatedContainer>
