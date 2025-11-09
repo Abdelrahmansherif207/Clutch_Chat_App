@@ -15,7 +15,7 @@ router.post("/login", loginValidationRules, validate, login);
 
 router.post("/logout", logout);
 
-router.put("/profile", updateProfile)
+router.put("/profile", protectRoute, updateProfile)
 
 router.get('/check', protectRoute, (req, res) => res.status(200).json(req.user))
 

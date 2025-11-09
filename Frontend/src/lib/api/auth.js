@@ -40,3 +40,15 @@ export const logOut = async () => {
         return { data: null, error }
     }
 }
+
+
+export const updateProfile = async (profilePic) => {
+    try {
+        const { data } = await axiosInstance.put("/auth/profile", profilePic);
+        return { data, error: null }
+    } catch (error) {
+        console.error("Error in update profile API call", error);
+        return { data: null, error }
+    }
+}
+
