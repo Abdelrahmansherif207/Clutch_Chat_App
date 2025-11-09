@@ -1,5 +1,5 @@
 import { create } from 'zustand'
-import { checkAuth, logIn, signUp, logOut } from '../lib/api/auth'
+import { checkAuth, logIn, signUp, logOut, updateProfile } from '../lib/api/auth'
 import toast from 'react-hot-toast'
 
 export const useAuthStore = create((set) => ({
@@ -8,6 +8,7 @@ export const useAuthStore = create((set) => ({
     isSigningup: false,
     isLoggingIn: false,
     isLogginOut: false,
+    isUpdatingProfile: false,
 
     checkAuth: async () => {
         const { data, error } = await checkAuth()
@@ -32,6 +33,7 @@ export const useAuthStore = create((set) => ({
     login: async (loginDto) => {
         set({ isLoggingIn: true });
         const { data, error } = await logIn(loginDto)
+        console.log(data, error)
         set({
             authUser: error ? null : data,
             isLoggingIn: false
@@ -50,6 +52,20 @@ export const useAuthStore = create((set) => ({
         })
         if (error) toast.error(error.response.data.message);
         else toast.success(data.message || "Logged out successfully!");
+    },
+
+    updateProfile: async (profilePic) => {
+        set({ isUpdatingProfile: true })
+        const { data, error } = await updateProfile(profilePic);
+
+        set((state) => ({
+            authUser: error ? state.authUser : data,
+            isUpdatingProfile: false
+        }));
+
+        // handle errors
+        if (error) toast.error(error.response.data.message);
+        else toast.success(data.message || "Updated Profile Successfully!");
     }
 
 }))

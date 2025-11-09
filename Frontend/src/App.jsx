@@ -15,7 +15,7 @@ export default function App() {
     checkAuth();
   }, [checkAuth])
 
-  console.log("auth user state: ",)
+  console.log("auth user state: ", authUser)
 
   if (isCheckingAuth) return <PageLoader />
   return (
@@ -25,9 +25,6 @@ export default function App() {
       <div className="absolute top-0 -left-4 size-96 bg-pink-500 opacity-20 blur-[100px]" />
       <div className="absolute bottom-0 -right-4 size-96 bg-cyan-500 opacity-20 blur-[100px]" />
 
-      <button className='btn-primary z-10' onClick={async () => {
-        await logout();
-      }}>Logout</button>
       <Routes>
         <Route
           path="/"
