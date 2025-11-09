@@ -4,9 +4,12 @@ import Path from 'path';
 // import routes
 import authRoutes from './routes/auth.route.js';
 import messageRoutes from './routes/message.route.js';
+// packages
 import path from 'path';
 import { connectDB } from './lib/db.js';
 import cookieParser from "cookie-parser";
+import cors from 'cors'
+
 
 
 
@@ -20,6 +23,10 @@ const __dirname = Path.resolve();
 // middlewares
 app.use(express.json());
 app.use(cookieParser());
+app.use(cors({
+    origin: process.env.CLIENT_URL,
+    credentials: true
+}))
 
 // use routes
 app.use("/api/auth", authRoutes);
