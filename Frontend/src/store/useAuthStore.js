@@ -24,8 +24,9 @@ export const useAuthStore = create((set) => ({
             authUser: error ? null : data,
             isSigningup: false
         })
-        if (error) toast.error(error.response.data.message);
+        if (error) toast.error(error.response.data.message || "Error creating account");
         else toast.success(data.message || "Account Created successful!");
+        return { data, error };
     },
 
     login: async (loginDto) => {
@@ -35,8 +36,9 @@ export const useAuthStore = create((set) => ({
             authUser: error ? null : data,
             isLoggingIn: false
         })
-        if (error) toast.error(error.response.data.message);
+        if (error) toast.error(error.response.data.message || "Error logging in");
         else toast.success(data.message || "Logged in successfully!");
+        return { data, error };
     },
 
     logout: async () => {
