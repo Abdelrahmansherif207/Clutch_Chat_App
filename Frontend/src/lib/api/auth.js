@@ -16,7 +16,27 @@ export const signUp = async (signupDto) => {
         const { data } = await axiosInstance.post("/auth/signup", signupDto);
         return { data, error: null }
     } catch (error) {
-        console.error("Error in sigUp API call: ", error);
+        console.error("Error in sigup API call: ", error);
+        return { data: null, error }
+    }
+}
+
+export const logIn = async (loginDto) => {
+    try {
+        const { data } = await axiosInstance.post("/auth/login", loginDto);
+        return { data, error: null }
+    } catch (error) {
+        console.error("Error in login API call: ", error);
+        return { data: null, error }
+    }
+}
+
+export const logOut = async () => {
+    try {
+        const { data } = await axiosInstance.post("/auth/logout");
+        return { data, error: null }
+    } catch (error) {
+        console.error("Error in logout API call: ", error);
         return { data: null, error }
     }
 }
