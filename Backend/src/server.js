@@ -9,15 +9,12 @@ import path from 'path';
 import { connectDB } from './lib/db.js';
 import cookieParser from "cookie-parser";
 import cors from 'cors'
-
-
+import { app, server } from './lib/socket.js'
 
 
 // app Initialization
 dotenv.config();
-const app = express();
 const PORT = process.env.PORT || 9090;
-
 const __dirname = Path.resolve();
 
 // middlewares
@@ -39,7 +36,7 @@ if (process.env.NODE_ENV == 'production') {
     app.get("*", (_, res) => res.sendFile(path.join(__dirname, "../Frontend", "dist", "index.html")))
 }
 
-app.listen(PORT, () => {
+server.listen(PORT, () => {
     console.log(`Server is running on http://localhost:${PORT}`)
     connectDB()
 }); 
