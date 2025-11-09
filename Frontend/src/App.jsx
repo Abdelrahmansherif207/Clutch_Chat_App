@@ -9,13 +9,24 @@ import { useEffect } from 'react';
 
 export default function App() {
 
-  const { checkAuth, isCheckingAuth, authUser, logout, isLogginOut } = useAuthStore();
+  const { checkAuth, isCheckingAuth, authUser, logout, isLogginOut, connectSocket, disconnectSocket } = useAuthStore();
 
   useEffect(() => {
     checkAuth();
   }, [checkAuth])
 
   console.log("auth user state: ", authUser)
+
+  useEffect(() => {
+    if (authUser) {
+      connectSocket();
+    } else {
+      disconnectSocket();
+    }
+
+    // Cleanup on unmount
+    return () => disconnectSocket();
+  }, [authUser, connectSocket, disconnectSocket]);
 
   if (isCheckingAuth) return <PageLoader />
   return (
